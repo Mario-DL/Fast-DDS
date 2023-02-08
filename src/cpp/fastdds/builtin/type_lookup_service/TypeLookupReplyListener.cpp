@@ -108,8 +108,3 @@ void TypeLookupReplyListener::onNewCacheChangeAdded(
     }
     reader->getHistory()->remove_change(change);
 }
-
-} // namespace builtin
-} // namespace dds
-} // namespace fastdds
-} // namespace eprosima

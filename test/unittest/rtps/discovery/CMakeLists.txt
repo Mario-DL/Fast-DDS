@@ -84,6 +84,7 @@ target_include_directories(EdpTests PRIVATE
     )
 target_link_libraries(EdpTests foonathan_memory
     GTest::gmock
+    fastdds::xtypes
     ${CMAKE_DL_LIBS})
 if(QNX)
     target_link_libraries(EdpTests socket)
@@ -184,4 +185,3 @@ else()
 endif()
 
 gtest_discover_tests(PDPTests)
-
