@@ -140,4 +140,3 @@ if(QNX)
     target_link_libraries(RTPSStatisticsTests socket)
     target_link_libraries(MonitorServiceTests socket)
 endif()
-
