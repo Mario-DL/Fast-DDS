@@ -320,5 +320,5 @@ bool TCPChannelResource::check_socket_send_buffer(
 }
 
 } // namespace rtps
-} // namespace fastrtps
+} // namespace fastdds
 } // namespace eprosima
