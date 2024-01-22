@@ -685,10 +685,6 @@ TEST_P(TransportTCP, TCPv6_copy)
    }
  */
 
-// Test copy constructor and copy assignment for TCPv4
-TEST_P(TransportTCP, TCPv4_autofill_port)
-{
-    PubSubReader<HelloWorldPubSubType> p1(TEST_TOPIC_NAME);
     PubSubReader<HelloWorldPubSubType> p2(TEST_TOPIC_NAME);
 
     // Add TCP Transport with listening port 0
