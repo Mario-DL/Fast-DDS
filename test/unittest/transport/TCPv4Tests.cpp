@@ -17,17 +17,19 @@
 
 #include <asio.hpp>
 #include <gtest/gtest.h>
-#include <MockReceiverResource.h>
-#include "mock/MockTCPChannelResource.h"
-#include "mock/MockTCPv4Transport.h"
+
 #include <fastdds/dds/log/Log.hpp>
 #include <fastdds/rtps/attributes/RTPSParticipantAttributes.h>
-#include <fastrtps/transport/TCPv4TransportDescriptor.h>
-#include <fastrtps/utils/Semaphore.h>
+#include <fastdds/rtps/transport/TCPv4TransportDescriptor.h>
 #include <fastrtps/utils/IPFinder.h>
 #include <fastrtps/utils/IPLocator.h>
-#include <rtps/transport/TCPv4Transport.h>
+#include <fastrtps/utils/Semaphore.h>
+
+#include "mock/MockTCPChannelResource.h"
+#include "mock/MockTCPv4Transport.h"
+#include <MockReceiverResource.h>
 #include <rtps/transport/tcp/RTCPHeader.h>
+#include <rtps/transport/TCPv4Transport.h>
 
 using namespace eprosima::fastrtps;
 using namespace eprosima::fastrtps::rtps;
@@ -75,8 +77,8 @@ public:
 
     void HELPER_SetDescriptorDefaults();
 
-    TCPv4TransportDescriptor descriptor;
-    TCPv4TransportDescriptor descriptorOnlyOutput;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor descriptor;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor descriptorOnlyOutput;
     std::unique_ptr<std::thread> senderThread;
     std::unique_ptr<std::thread> receiverThread;
 };
@@ -110,7 +112,7 @@ TEST_F(TCPv4Tests, opening_and_closing_output_channel)
     genericOutputChannelLocator.kind = LOCATOR_KIND_TCPv4;
     genericOutputChannelLocator.port = g_output_port; // arbitrary
     IPLocator::setLogicalPort(genericOutputChannelLocator, g_output_port);
-    SendResourceList send_resource_list;
+    eprosima::fastdds::rtps::SendResourceList send_resource_list;
 
     // Then
     ASSERT_FALSE(transportUnderTest.is_output_channel_open_for(genericOutputChannelLocator));
@@ -134,7 +136,7 @@ TEST_F(TCPv4Tests, opening_and_closing_output_channel_with_listener)
     genericOutputChannelLocator.kind = LOCATOR_KIND_TCPv4;
     genericOutputChannelLocator.port = g_output_port; // arbitrary
     IPLocator::setLogicalPort(genericOutputChannelLocator, g_output_port);
-    SendResourceList send_resource_list;
+    eprosima::fastdds::rtps::SendResourceList send_resource_list;
 
     // Then
     ASSERT_FALSE(transportUnderTest.is_output_channel_open_for(genericOutputChannelLocator));
@@ -171,12 +173,12 @@ TEST_F(TCPv4Tests, send_and_receive_between_ports)
     eprosima::fastdds::dds::Log::SetVerbosity(eprosima::fastdds::dds::Log::Kind::Info);
     std::regex filter("RTCP(?!_SEQ)");
     eprosima::fastdds::dds::Log::SetCategoryFilter(filter);
-    TCPv4TransportDescriptor recvDescriptor;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor recvDescriptor;
     recvDescriptor.add_listener_port(g_default_port);
     TCPv4Transport receiveTransportUnderTest(recvDescriptor);
     receiveTransportUnderTest.init();
 
-    TCPv4TransportDescriptor sendDescriptor;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor sendDescriptor;
     TCPv4Transport sendTransportUnderTest(sendDescriptor);
     sendTransportUnderTest.init();
 
@@ -199,7 +201,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_ports)
     MockMessageReceiver* msg_recv = dynamic_cast<MockMessageReceiver*>(receiver.CreateMessageReceiver());
     ASSERT_TRUE(receiveTransportUnderTest.IsInputChannelOpen(inputLocator));
 
-    SendResourceList send_resource_list;
+    eprosima::fastdds::rtps::SendResourceList send_resource_list;
     ASSERT_TRUE(sendTransportUnderTest.OpenOutputChannel(send_resource_list, outputLocator));
     ASSERT_FALSE(send_resource_list.empty());
     octet message[5] = { 'H', 'e', 'l', 'l', 'o' };
@@ -246,7 +248,7 @@ TEST_F(TCPv4Tests, send_is_rejected_if_buffer_size_is_bigger_to_size_specified_i
     genericOutputChannelLocator.kind = LOCATOR_KIND_TCPv4;
     genericOutputChannelLocator.port = g_output_port;
     IPLocator::setLogicalPort(genericOutputChannelLocator, 7400);
-    SendResourceList send_resource_list;
+    eprosima::fastdds::rtps::SendResourceList send_resource_list;
     transportUnderTest.OpenOutputChannel(send_resource_list, genericOutputChannelLocator);
     ASSERT_FALSE(send_resource_list.empty());
 
@@ -282,7 +284,7 @@ TEST_F(TCPv4Tests, RemoteToMainLocal_simply_strips_out_address_leaving_IP_ANY)
 
     ASSERT_EQ(mainLocalLocator.port, remote_locator.port);
     ASSERT_EQ(mainLocalLocator.kind, remote_locator.kind);
-    ASSERT_EQ(IPLocator::toIPv4string(mainLocalLocator), s_IPv4AddressAny);
+    ASSERT_EQ(IPLocator::toIPv4string(mainLocalLocator), eprosima::fastdds::rtps::s_IPv4AddressAny);
 }
 
 TEST_F(TCPv4Tests, match_if_port_AND_address_matches)
@@ -314,7 +316,7 @@ TEST_F(TCPv4Tests, send_to_wrong_interface)
     outputChannelLocator.kind = LOCATOR_KIND_TCPv4;
     IPLocator::setLogicalPort(outputChannelLocator, 7400);
     IPLocator::setIPv4(outputChannelLocator, 127, 0, 0, 1); // Loopback
-    SendResourceList send_resource_list;
+    eprosima::fastdds::rtps::SendResourceList send_resource_list;
     ASSERT_TRUE(transportUnderTest.OpenOutputChannel(send_resource_list, outputChannelLocator));
     ASSERT_FALSE(send_resource_list.empty());
 
@@ -343,7 +345,7 @@ TEST_F(TCPv4Tests, send_to_blocked_interface)
     outputChannelLocator.kind = LOCATOR_KIND_TCPv4;
     IPLocator::setLogicalPort(outputChannelLocator, 7400);
     IPLocator::setIPv4(outputChannelLocator, 127, 0, 0, 1); // Loopback
-    SendResourceList send_resource_list;
+    eprosima::fastdds::rtps::SendResourceList send_resource_list;
     ASSERT_TRUE(transportUnderTest.OpenOutputChannel(send_resource_list, outputChannelLocator));
     ASSERT_FALSE(send_resource_list.empty());
 
@@ -383,13 +385,13 @@ TEST_F(TCPv4Tests, send_and_receive_between_allowed_interfaces_ports)
             eprosima::fastdds::dds::Log::SetVerbosity(eprosima::fastdds::dds::Log::Kind::Info);
             std::regex filter("RTCP(?!_SEQ)");
             eprosima::fastdds::dds::Log::SetCategoryFilter(filter);
-            TCPv4TransportDescriptor recvDescriptor;
+            eprosima::fastdds::rtps::TCPv4TransportDescriptor recvDescriptor;
             recvDescriptor.interfaceWhiteList.emplace_back(IPLocator::toIPv4string(locator));
             recvDescriptor.add_listener_port(g_default_port);
             TCPv4Transport receiveTransportUnderTest(recvDescriptor);
             receiveTransportUnderTest.init();
 
-            TCPv4TransportDescriptor sendDescriptor;
+            eprosima::fastdds::rtps::TCPv4TransportDescriptor sendDescriptor;
             sendDescriptor.interfaceWhiteList.emplace_back(IPLocator::toIPv4string(locator));
             TCPv4Transport sendTransportUnderTest(sendDescriptor);
             sendTransportUnderTest.init();
@@ -414,7 +416,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_allowed_interfaces_ports)
                 MockMessageReceiver* msg_recv = dynamic_cast<MockMessageReceiver*>(receiver.CreateMessageReceiver());
                 ASSERT_TRUE(receiveTransportUnderTest.IsInputChannelOpen(inputLocator));
 
-                SendResourceList send_resource_list;
+                eprosima::fastdds::rtps::SendResourceList send_resource_list;
                 ASSERT_TRUE(sendTransportUnderTest.OpenOutputChannel(send_resource_list, outputLocator));
                 ASSERT_FALSE(send_resource_list.empty());
                 octet message[5] = { 'H', 'e', 'l', 'l', 'o' };
@@ -487,7 +489,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_allowed_interfaces_ports_by_name)
     eprosima::fastdds::dds::Log::SetVerbosity(eprosima::fastdds::dds::Log::Kind::Info);
     std::regex filter("RTCP(?!_SEQ)");
     eprosima::fastdds::dds::Log::SetCategoryFilter(filter);
-    TCPv4TransportDescriptor recvDescriptor;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor recvDescriptor;
     std::cout << "Adding to whitelist: " << interfaces[0].dev << " " << interfaces[0].name << " " <<
         interfaces[0].locator << std::endl;
     recvDescriptor.interfaceWhiteList.emplace_back(interfaces[0].dev);
@@ -496,7 +498,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_allowed_interfaces_ports_by_name)
     TCPv4Transport receiveTransportUnderTest(recvDescriptor);
     receiveTransportUnderTest.init();
 
-    TCPv4TransportDescriptor sendDescriptor;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor sendDescriptor;
     sendDescriptor.interfaceWhiteList.emplace_back(interfaces[0].dev);
 
     TCPv4Transport sendTransportUnderTest(sendDescriptor);
@@ -522,7 +524,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_allowed_interfaces_ports_by_name)
         MockMessageReceiver* msg_recv = dynamic_cast<MockMessageReceiver*>(receiver.CreateMessageReceiver());
         ASSERT_TRUE(receiveTransportUnderTest.IsInputChannelOpen(inputLocator));
 
-        SendResourceList send_resource_list;
+        eprosima::fastdds::rtps::SendResourceList send_resource_list;
         ASSERT_TRUE(sendTransportUnderTest.OpenOutputChannel(send_resource_list, outputLocator));
         ASSERT_FALSE(send_resource_list.empty());
         octet message[5] = { 'H', 'e', 'l', 'l', 'o' };
@@ -577,7 +579,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_secure_ports_client_verifies)
     using TLSOptions = TCPTransportDescriptor::TLSConfig::TLSOptions;
     using TLSVerifyMode = TCPTransportDescriptor::TLSConfig::TLSVerifyMode;
 
-    TCPv4TransportDescriptor recvDescriptor;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor recvDescriptor;
     recvDescriptor.add_listener_port(g_default_port);
     recvDescriptor.apply_security = true;
     recvDescriptor.tls_config.password = "fastddspwd";
@@ -592,7 +594,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_secure_ports_client_verifies)
     TCPv4Transport receiveTransportUnderTest(recvDescriptor);
     receiveTransportUnderTest.init();
 
-    TCPv4TransportDescriptor sendDescriptor;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor sendDescriptor;
     sendDescriptor.apply_security = true;
     sendDescriptor.tls_config.verify_file = "ca.crt";
     sendDescriptor.tls_config.verify_mode = TLSVerifyMode::VERIFY_PEER;
@@ -623,7 +625,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_secure_ports_client_verifies)
         MockMessageReceiver* msg_recv = dynamic_cast<MockMessageReceiver*>(receiver.CreateMessageReceiver());
         ASSERT_TRUE(receiveTransportUnderTest.IsInputChannelOpen(inputLocator));
 
-        SendResourceList send_resource_list;
+        eprosima::fastdds::rtps::SendResourceList send_resource_list;
         ASSERT_TRUE(sendTransportUnderTest.OpenOutputChannel(send_resource_list, outputLocator));
         ASSERT_FALSE(send_resource_list.empty());
         octet message[5] = { 'H', 'e', 'l', 'l', 'o' };
@@ -674,7 +676,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_secure_ports_server_verifies)
     using TLSVerifyMode = TCPTransportDescriptor::TLSConfig::TLSVerifyMode;
     using TLSHSRole = TCPTransportDescriptor::TLSConfig::TLSHandShakeRole;
 
-    TCPv4TransportDescriptor recvDescriptor;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor recvDescriptor;
     recvDescriptor.add_listener_port(g_default_port);
     recvDescriptor.apply_security = true;
     recvDescriptor.tls_config.handshake_role = TLSHSRole::CLIENT;
@@ -687,7 +689,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_secure_ports_server_verifies)
     TCPv4Transport receiveTransportUnderTest(recvDescriptor);
     receiveTransportUnderTest.init();
 
-    TCPv4TransportDescriptor sendDescriptor;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor sendDescriptor;
     sendDescriptor.apply_security = true;
     sendDescriptor.tls_config.handshake_role = TLSHSRole::SERVER;
     sendDescriptor.tls_config.password = "fastddspwd";
@@ -722,7 +724,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_secure_ports_server_verifies)
         MockMessageReceiver* msg_recv = dynamic_cast<MockMessageReceiver*>(receiver.CreateMessageReceiver());
         ASSERT_TRUE(receiveTransportUnderTest.IsInputChannelOpen(inputLocator));
 
-        SendResourceList send_resource_list;
+        eprosima::fastdds::rtps::SendResourceList send_resource_list;
         ASSERT_TRUE(sendTransportUnderTest.OpenOutputChannel(send_resource_list, outputLocator));
         ASSERT_FALSE(send_resource_list.empty());
         octet message[5] = { 'H', 'e', 'l', 'l', 'o' };
@@ -772,7 +774,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_both_secure_ports)
     using TLSOptions = TCPTransportDescriptor::TLSConfig::TLSOptions;
     using TLSVerifyMode = TCPTransportDescriptor::TLSConfig::TLSVerifyMode;
 
-    TCPv4TransportDescriptor recvDescriptor;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor recvDescriptor;
     recvDescriptor.add_listener_port(g_default_port);
     recvDescriptor.apply_security = true;
     recvDescriptor.tls_config.password = "testkey";
@@ -789,7 +791,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_both_secure_ports)
     TCPv4Transport receiveTransportUnderTest(recvDescriptor);
     receiveTransportUnderTest.init();
 
-    TCPv4TransportDescriptor sendDescriptor;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor sendDescriptor;
     sendDescriptor.apply_security = true;
     sendDescriptor.tls_config.password = "testkey";
     sendDescriptor.tls_config.cert_chain_file = "mainsubcert.pem";
@@ -824,7 +826,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_both_secure_ports)
         MockMessageReceiver* msg_recv = dynamic_cast<MockMessageReceiver*>(receiver.CreateMessageReceiver());
         ASSERT_TRUE(receiveTransportUnderTest.IsInputChannelOpen(inputLocator));
 
-        SendResourceList send_resource_list;
+        eprosima::fastdds::rtps::SendResourceList send_resource_list;
         ASSERT_TRUE(sendTransportUnderTest.OpenOutputChannel(send_resource_list, outputLocator));
         ASSERT_FALSE(send_resource_list.empty());
         octet message[5] = { 'H', 'e', 'l', 'l', 'o' };
@@ -874,7 +876,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_both_secure_ports_untrusted)
     using TLSOptions = TCPTransportDescriptor::TLSConfig::TLSOptions;
     using TLSVerifyMode = TCPTransportDescriptor::TLSConfig::TLSVerifyMode;
 
-    TCPv4TransportDescriptor recvDescriptor;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor recvDescriptor;
     recvDescriptor.add_listener_port(g_default_port);
     recvDescriptor.apply_security = true;
     recvDescriptor.tls_config.password = "testkey";
@@ -891,7 +893,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_both_secure_ports_untrusted)
     TCPv4Transport receiveTransportUnderTest(recvDescriptor);
     receiveTransportUnderTest.init();
 
-    TCPv4TransportDescriptor sendDescriptor;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor sendDescriptor;
     sendDescriptor.apply_security = true;
     sendDescriptor.tls_config.password = "testkey";
     sendDescriptor.tls_config.cert_chain_file = "mainsubcert.pem";
@@ -926,7 +928,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_both_secure_ports_untrusted)
         MockMessageReceiver* msg_recv = dynamic_cast<MockMessageReceiver*>(receiver.CreateMessageReceiver());
         ASSERT_TRUE(receiveTransportUnderTest.IsInputChannelOpen(inputLocator));
 
-        SendResourceList send_resource_list;
+        eprosima::fastdds::rtps::SendResourceList send_resource_list;
         ASSERT_TRUE(sendTransportUnderTest.OpenOutputChannel(send_resource_list, outputLocator));
         ASSERT_FALSE(send_resource_list.empty());
         octet message[5] = { 'H', 'e', 'l', 'l', 'o' };
@@ -981,7 +983,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_secure_clients_1)
     using TLSOptions = TCPTransportDescriptor::TLSConfig::TLSOptions;
     using TLSHSRole = TCPTransportDescriptor::TLSConfig::TLSHandShakeRole;
 
-    TCPv4TransportDescriptor recvDescriptor;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor recvDescriptor;
     recvDescriptor.add_listener_port(g_default_port);
     recvDescriptor.apply_security = true;
     recvDescriptor.tls_config.handshake_role = TLSHSRole::CLIENT;
@@ -997,7 +999,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_secure_clients_1)
     TCPv4Transport receiveTransportUnderTest(recvDescriptor);
     receiveTransportUnderTest.init();
 
-    TCPv4TransportDescriptor sendDescriptor;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor sendDescriptor;
     sendDescriptor.apply_security = true;
     sendDescriptor.tls_config.handshake_role = TLSHSRole::SERVER;
     sendDescriptor.tls_config.password = "testkey";
@@ -1032,7 +1034,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_secure_clients_1)
         MockMessageReceiver* msg_recv = dynamic_cast<MockMessageReceiver*>(receiver.CreateMessageReceiver());
         ASSERT_TRUE(receiveTransportUnderTest.IsInputChannelOpen(inputLocator));
 
-        SendResourceList send_resource_list;
+        eprosima::fastdds::rtps::SendResourceList send_resource_list;
         ASSERT_TRUE(sendTransportUnderTest.OpenOutputChannel(send_resource_list, outputLocator));
         ASSERT_FALSE(send_resource_list.empty());
         octet message[5] = { 'H', 'e', 'l', 'l', 'o' };
@@ -1082,7 +1084,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_secure_clients_1)
     using TLSOptions = TCPTransportDescriptor::TLSConfig::TLSOptions;
     using TLSHSRole = TCPTransportDescriptor::TLSConfig::TLSHandShakeRole;
 
-    TCPv4TransportDescriptor recvDescriptor;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor recvDescriptor;
     recvDescriptor.add_listener_port(g_default_port + 1);
     recvDescriptor.apply_security = true;
     recvDescriptor.tls_config.handshake_role = TLSHSRole::CLIENT;
@@ -1110,7 +1112,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_secure_clients_1)
     outputLocator.port = g_default_port + 1;
     IPLocator::setLogicalPort(outputLocator, 7410);
 
-    TCPv4TransportDescriptor sendDescriptor2;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor sendDescriptor2;
     sendDescriptor2.apply_security = true;
     sendDescriptor2.tls_config.handshake_role = TLSHSRole::SERVER;
     sendDescriptor2.tls_config.password = "test";
@@ -1171,7 +1173,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_secure_ports_untrusted_server)
     using TLSOptions = TCPTransportDescriptor::TLSConfig::TLSOptions;
     using TLSVerifyMode = TCPTransportDescriptor::TLSConfig::TLSVerifyMode;
 
-    TCPv4TransportDescriptor recvDescriptor;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor recvDescriptor;
     recvDescriptor.add_listener_port(g_default_port);
     recvDescriptor.apply_security = true;
     recvDescriptor.tls_config.password = "testkey";
@@ -1187,7 +1189,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_secure_ports_untrusted_server)
     TCPv4Transport receiveTransportUnderTest(recvDescriptor);
     receiveTransportUnderTest.init();
 
-    TCPv4TransportDescriptor sendDescriptor;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor sendDescriptor;
     sendDescriptor.apply_security = true;
     sendDescriptor.tls_config.verify_file = "ca.pem"; // This CA doesn't know about these certificates
     sendDescriptor.tls_config.verify_mode = TLSVerifyMode::VERIFY_PEER;
@@ -1219,7 +1221,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_secure_ports_untrusted_server)
         MockMessageReceiver* msg_recv = dynamic_cast<MockMessageReceiver*>(receiver.CreateMessageReceiver());
         ASSERT_TRUE(receiveTransportUnderTest.IsInputChannelOpen(inputLocator));
 
-        SendResourceList send_resource_list;
+        eprosima::fastdds::rtps::SendResourceList send_resource_list;
         ASSERT_TRUE(sendTransportUnderTest.OpenOutputChannel(send_resource_list, outputLocator));
         ASSERT_FALSE(send_resource_list.empty());
         octet message[5] = { 'H', 'e', 'l', 'l', 'o' };
@@ -1276,7 +1278,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_both_secure_ports_with_sni)
     using TLSOptions = TCPTransportDescriptor::TLSConfig::TLSOptions;
     using TLSVerifyMode = TCPTransportDescriptor::TLSConfig::TLSVerifyMode;
 
-    TCPv4TransportDescriptor recvDescriptor;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor recvDescriptor;
     recvDescriptor.add_listener_port(g_default_port);
     recvDescriptor.apply_security = true;
     recvDescriptor.tls_config.password = "testkey";
@@ -1293,7 +1295,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_both_secure_ports_with_sni)
     TCPv4Transport receiveTransportUnderTest(recvDescriptor);
     receiveTransportUnderTest.init();
 
-    TCPv4TransportDescriptor sendDescriptor;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor sendDescriptor;
     sendDescriptor.apply_security = true;
     sendDescriptor.tls_config.password = "testkey";
     sendDescriptor.tls_config.cert_chain_file = "mainsubcert.pem";
@@ -1329,7 +1331,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_both_secure_ports_with_sni)
         MockMessageReceiver* msg_recv = dynamic_cast<MockMessageReceiver*>(receiver.CreateMessageReceiver());
         ASSERT_TRUE(receiveTransportUnderTest.IsInputChannelOpen(inputLocator));
 
-        SendResourceList send_resource_list;
+        eprosima::fastdds::rtps::SendResourceList send_resource_list;
         ASSERT_TRUE(sendTransportUnderTest.OpenOutputChannel(send_resource_list, outputLocator));
         ASSERT_FALSE(send_resource_list.empty());
         octet message[5] = { 'H', 'e', 'l', 'l', 'o' };
@@ -1499,13 +1501,13 @@ TEST_F(TCPv4Tests, send_and_receive_between_allowed_localhost_interfaces_ports)
     eprosima::fastdds::dds::Log::SetVerbosity(eprosima::fastdds::dds::Log::Kind::Info);
     std::regex filter("RTCP(?!_SEQ)");
     eprosima::fastdds::dds::Log::SetCategoryFilter(filter);
-    TCPv4TransportDescriptor recvDescriptor;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor recvDescriptor;
     recvDescriptor.interfaceWhiteList.emplace_back("127.0.0.1");
     recvDescriptor.add_listener_port(g_default_port);
     TCPv4Transport receiveTransportUnderTest(recvDescriptor);
     receiveTransportUnderTest.init();
 
-    TCPv4TransportDescriptor sendDescriptor;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor sendDescriptor;
     sendDescriptor.interfaceWhiteList.emplace_back("127.0.0.1");
     TCPv4Transport sendTransportUnderTest(sendDescriptor);
     sendTransportUnderTest.init();
@@ -1530,7 +1532,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_allowed_localhost_interfaces_ports)
         MockMessageReceiver* msg_recv = dynamic_cast<MockMessageReceiver*>(receiver.CreateMessageReceiver());
         ASSERT_TRUE(receiveTransportUnderTest.IsInputChannelOpen(inputLocator));
 
-        SendResourceList send_resource_list;
+        eprosima::fastdds::rtps::SendResourceList send_resource_list;
         ASSERT_TRUE(sendTransportUnderTest.OpenOutputChannel(send_resource_list, outputLocator));
         ASSERT_FALSE(send_resource_list.empty());
         octet message[5] = { 'H', 'e', 'l', 'l', 'o' };
@@ -1594,13 +1596,13 @@ TEST_F(TCPv4Tests, send_and_receive_between_blocked_interfaces_ports)
             eprosima::fastdds::dds::Log::SetVerbosity(eprosima::fastdds::dds::Log::Kind::Info);
             std::regex filter("RTCP(?!_SEQ)");
             eprosima::fastdds::dds::Log::SetCategoryFilter(filter);
-            TCPv4TransportDescriptor recvDescriptor;
+            eprosima::fastdds::rtps::TCPv4TransportDescriptor recvDescriptor;
             recvDescriptor.interfaceWhiteList.emplace_back(IPLocator::toIPv4string(locator));
             recvDescriptor.add_listener_port(g_default_port);
             TCPv4Transport receiveTransportUnderTest(recvDescriptor);
             receiveTransportUnderTest.init();
 
-            TCPv4TransportDescriptor sendDescriptor;
+            eprosima::fastdds::rtps::TCPv4TransportDescriptor sendDescriptor;
             sendDescriptor.interfaceWhiteList.emplace_back(IPLocator::toIPv4string(locator));
             TCPv4Transport sendTransportUnderTest(sendDescriptor);
             sendTransportUnderTest.init();
@@ -1625,7 +1627,7 @@ TEST_F(TCPv4Tests, send_and_receive_between_blocked_interfaces_ports)
                 MockMessageReceiver* msg_recv = dynamic_cast<MockMessageReceiver*>(receiver.CreateMessageReceiver());
                 ASSERT_TRUE(receiveTransportUnderTest.IsInputChannelOpen(inputLocator));
 
-                SendResourceList send_resource_list;
+                eprosima::fastdds::rtps::SendResourceList send_resource_list;
                 ASSERT_TRUE(sendTransportUnderTest.OpenOutputChannel(send_resource_list, outputLocator));
                 ASSERT_FALSE(send_resource_list.empty());
                 octet message[5] = { 'H', 'e', 'l', 'l', 'o' };
@@ -1686,7 +1688,7 @@ TEST_F(TCPv4Tests, receive_unordered_data)
         "-RTCRTC", "-RTCRT", "-RTCR"
     };
 
-    struct Receiver : public TransportReceiverInterface
+    struct Receiver : public eprosima::fastdds::rtps::TransportReceiverInterface
     {
         std::array<std::size_t, 3> num_received{ 0, 0, 0 };
 
@@ -1720,7 +1722,7 @@ TEST_F(TCPv4Tests, receive_unordered_data)
 
     Receiver receiver;
 
-    TCPv4TransportDescriptor test_descriptor = descriptor;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor test_descriptor = descriptor;
     test_descriptor.check_crc = false;
     TCPv4Transport uut(test_descriptor);
     ASSERT_TRUE(uut.init()) << "Failed to initialize transport. Port " << g_default_port << " may be in use";
@@ -1813,7 +1815,7 @@ TEST_F(TCPv4Tests, header_read_interrumption)
     std::regex filter("RTCP(?!_SEQ)");
     eprosima::fastdds::dds::Log::SetCategoryFilter(filter);
 
-    TCPv4TransportDescriptor test_descriptor;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor test_descriptor;
     test_descriptor.add_listener_port(g_default_port);
     TCPv4Transport transportUnderTest(test_descriptor);
     transportUnderTest.init();
@@ -1855,7 +1857,7 @@ TEST_F(TCPv4Tests, header_read_interrumption)
 TEST_F(TCPv4Tests, autofill_port)
 {
     // Check normal port assignation
-    TCPv4TransportDescriptor test_descriptor;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor test_descriptor;
     test_descriptor.add_listener_port(g_default_port);
     TCPv4Transport transportUnderTest(test_descriptor);
     transportUnderTest.init();
@@ -1863,7 +1865,7 @@ TEST_F(TCPv4Tests, autofill_port)
     EXPECT_TRUE(transportUnderTest.configuration()->listening_ports[0] == g_default_port);
 
     // Check default port assignation
-    TCPv4TransportDescriptor test_descriptor_autofill;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor test_descriptor_autofill;
     test_descriptor_autofill.add_listener_port(0);
     TCPv4Transport transportUnderTest_autofill(test_descriptor_autofill);
     transportUnderTest_autofill.init();
@@ -1872,7 +1874,7 @@ TEST_F(TCPv4Tests, autofill_port)
     EXPECT_TRUE(transportUnderTest_autofill.configuration()->listening_ports.size() == 1);
 
     uint16_t port = 12345;
-    TCPv4TransportDescriptor test_descriptor_multiple_autofill;
+    eprosima::fastdds::rtps::TCPv4TransportDescriptor test_descriptor_multiple_autofill;
     test_descriptor_multiple_autofill.add_listener_port(0);
     test_descriptor_multiple_autofill.add_listener_port(port);
     test_descriptor_multiple_autofill.add_listener_port(0);
