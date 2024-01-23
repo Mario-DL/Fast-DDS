@@ -31,9 +31,9 @@
 #include <fastrtps/xmlparser/XMLParserCommon.h>
 #include <fastrtps/xmlparser/XMLProfileManager.h>
 
-#include <rtps/xmlparser/XMLParserUtils.hpp>
 #include <utils/SystemInfo.hpp>
 #include <utils/string_utilities.hpp>
+#include <xmlparser/XMLParserUtils.hpp>
 
 namespace eprosima {
 namespace fastdds {
