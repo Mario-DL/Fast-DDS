@@ -17,6 +17,8 @@
  *
  */
 
+#include <rtps/participant/RTPSParticipantImpl.h>
+
 #include <algorithm>
 #include <functional>
 #include <memory>
@@ -50,20 +52,18 @@
 #include <fastdds/rtps/writer/StatefulWriter.h>
 #include <fastdds/rtps/writer/StatelessPersistentWriter.h>
 #include <fastdds/rtps/writer/StatefulPersistentWriter.h>
-
 #include <fastrtps/utils/IPFinder.h>
 #include <fastrtps/utils/Semaphore.h>
-#include <fastrtps/xmlparser/XMLProfileManager.h>
 
-#include <rtps/builtin/discovery/participant/PDPServer.hpp>
 #include <rtps/builtin/discovery/participant/PDPClient.h>
+#include <rtps/builtin/discovery/participant/PDPServer.hpp>
 #include <rtps/history/BasicPayloadPool.hpp>
 #include <rtps/network/ExternalLocatorsProcessor.hpp>
-#include <rtps/participant/RTPSParticipantImpl.h>
 #include <rtps/persistence/PersistenceService.h>
 #include <statistics/rtps/GuidUtils.hpp>
-#include <utils/SystemInfo.hpp>
 #include <utils/string_utilities.hpp>
+#include <utils/SystemInfo.hpp>
+#include <xmlparser/XMLProfileManager.h>
 
 #ifdef FASTDDS_STATISTICS
 #include <statistics/types/monitorservice_types.h>

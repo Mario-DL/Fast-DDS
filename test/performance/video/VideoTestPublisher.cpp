@@ -25,7 +25,6 @@
 
 #include <fastdds/dds/log/Colors.hpp>
 #include <fastdds/dds/log/Log.hpp>
-#include <fastrtps/xmlparser/XMLProfileManager.h>
 
 #define TIME_LIMIT_US 10000
 

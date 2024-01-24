@@ -22,58 +22,48 @@
 #include <thread>
 #include <type_traits>
 
+#include <asio.hpp>
+#include <fastcdr/Cdr.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <fastcdr/Cdr.h>
-
+#include "fastdds/dds/common/InstanceHandle.hpp"
+#include "fastdds/dds/core/policy/QosPolicies.hpp"
 #include <fastdds/dds/builtin/topic/PublicationBuiltinTopicData.hpp>
-
+#include <fastdds/dds/core/condition/WaitSet.hpp>
 #include <fastdds/dds/core/Entity.hpp>
 #include <fastdds/dds/core/LoanableArray.hpp>
 #include <fastdds/dds/core/LoanableCollection.hpp>
 #include <fastdds/dds/core/LoanableSequence.hpp>
 #include <fastdds/dds/core/StackAllocatedSequence.hpp>
-#include <fastdds/dds/core/condition/WaitSet.hpp>
 #include <fastdds/dds/core/status/BaseStatus.hpp>
 #include <fastdds/dds/core/status/SampleRejectedStatus.hpp>
 #include <fastdds/dds/core/status/SubscriptionMatchedStatus.hpp>
-
-#include <fastdds/dds/domain/DomainParticipantFactory.hpp>
 #include <fastdds/dds/domain/DomainParticipant.hpp>
+#include <fastdds/dds/domain/DomainParticipantFactory.hpp>
 #include <fastdds/dds/domain/DomainParticipantListener.hpp>
-
 #include <fastdds/dds/publisher/DataWriter.hpp>
 #include <fastdds/dds/publisher/Publisher.hpp>
 #include <fastdds/dds/publisher/qos/DataWriterQos.hpp>
 #include <fastdds/dds/publisher/qos/PublisherQos.hpp>
-
 #include <fastdds/dds/subscriber/DataReader.hpp>
 #include <fastdds/dds/subscriber/DataReaderListener.hpp>
-#include <fastdds/dds/subscriber/SampleInfo.hpp>
-#include <fastdds/dds/subscriber/Subscriber.hpp>
 #include <fastdds/dds/subscriber/qos/DataReaderQos.hpp>
 #include <fastdds/dds/subscriber/qos/SubscriberQos.hpp>
-
+#include <fastdds/dds/subscriber/SampleInfo.hpp>
+#include <fastdds/dds/subscriber/Subscriber.hpp>
 #include <fastdds/rtps/common/Locator.h>
+#include <fastdds/rtps/transport/test_UDPv4TransportDescriptor.h>
 #include <fastrtps/utils/IPLocator.h>
 
-#include "FooBoundedType.hpp"
-#include "FooBoundedTypeSupport.hpp"
-
-#include "FooType.hpp"
-#include "FooTypeSupport.hpp"
-
-#include "../../logging/mock/MockConsumer.h"
-
-#include <fastdds/rtps/transport/test_UDPv4TransportDescriptor.h>
-#include <fastrtps/xmlparser/XMLProfileManager.h>
+#include <xmlparser/XMLProfileManager.h>
 
 #include "../../common/CustomPayloadPool.hpp"
-#include "fastdds/dds/common/InstanceHandle.hpp"
-#include "fastdds/dds/core/policy/QosPolicies.hpp"
-
-#include <asio.hpp>
+#include "../../logging/mock/MockConsumer.h"
+#include "FooBoundedType.hpp"
+#include "FooBoundedTypeSupport.hpp"
+#include "FooType.hpp"
+#include "FooTypeSupport.hpp"
 
 #if defined(__cplusplus_winrt)
 #define GET_PID GetCurrentProcessId

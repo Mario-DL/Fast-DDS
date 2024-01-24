@@ -17,6 +17,8 @@
  *
  */
 
+#include "VideoTestSubscriber.hpp"
+
 #include <cmath>
 #include <fstream>
 #include <numeric>
@@ -24,9 +26,6 @@
 
 #include <fastdds/dds/log/Colors.hpp>
 #include <fastdds/dds/log/Log.hpp>
-#include <fastrtps/xmlparser/XMLProfileManager.h>
-
-#include "VideoTestSubscriber.hpp"
 
 using namespace eprosima;
 using namespace eprosima::fastrtps;
