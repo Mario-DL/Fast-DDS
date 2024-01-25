@@ -22,7 +22,6 @@
 #include <fastdds/rtps/transport/TCPv4TransportDescriptor.h>
 #include <fastdds/rtps/transport/TCPv6TransportDescriptor.h>
 
-// TODO(jlbueno): Uncomment after migrating to Fast DDS API
 #include "../api/dds-pim/TCPReqRepHelloWorldRequester.hpp"
 #include "../api/dds-pim/TCPReqRepHelloWorldReplier.hpp"
 #include "PubSubReader.hpp"
@@ -66,7 +65,6 @@ public:
     std::shared_ptr<eprosima::fastdds::rtps::TCPTransportDescriptor> test_transport_;
 };
 
-// TODO(jlbueno): Uncomment after migrating to Fast DDS API
 
 // TCP and Domain management with logical ports tests
 TEST_P(TransportTCP, TCPDomainHelloWorld_P0_P1_D0_D0)
@@ -405,7 +403,6 @@ TEST_P(TransportTCP, TCPMaxInitialPeer_P0_5_P4)
 
 
 #if TLS_FOUND
-// TODO(jlbueno): Uncomment after migrating to Fast DDS API
 
 TEST_P(TransportTCP, TCP_TLS)
 {
@@ -498,7 +495,6 @@ void tls_init()
 #endif // if TLS_FOUND
 
 // Regression test for ShrinkLocators/transform_remote_locators mechanism.
-// TODO(jlbueno): Uncomment after migrating to Fast DDS API
 
 TEST_P(TransportTCP, TCPLocalhost)
 {
@@ -623,7 +619,6 @@ TEST_P(TransportTCP, TCPv6_copy)
 
 // Test connection is successfully restablished after dropping and relaunching a TCP client (requester)
 // Issue -> https://github.com/eProsima/Fast-DDS/issues/2409
-// TODO(jlbueno): Uncomment after migrating to Fast DDS API
 
 TEST(TransportTCP, Client_reconnection)
 {
@@ -684,7 +679,10 @@ TEST(TransportTCP, Client_reconnection)
     delete requester;
 }
 
-
+// Test copy constructor and copy assignment for TCPv4
+TEST_P(TransportTCP, TCPv4_autofill_port)
+{
+    PubSubReader<HelloWorldPubSubType> p1(TEST_TOPIC_NAME);
     PubSubReader<HelloWorldPubSubType> p2(TEST_TOPIC_NAME);
 
     // Add TCP Transport with listening port 0
