@@ -138,8 +138,8 @@ set(BLACKBOXTESTS_SOURCE ${BLACKBOXTESTS_TEST_SOURCE}
 
     common/DatagramInjectionTransport.cpp
     # TODO(jlbueno): Uncomment after migrating to Fast DDS API
-    # common/TCPReqRepHelloWorldRequester.cpp
-    # common/TCPReqRepHelloWorldReplier.cpp
+     api/dds-pim/TCPReqRepHelloWorldRequester.cpp
+     api/dds-pim/TCPReqRepHelloWorldReplier.cpp
     )
 
 file(GLOB DDS_BLACKBOXTESTS_TEST_SOURCE "common/DDSBlackboxTests*.cpp")
