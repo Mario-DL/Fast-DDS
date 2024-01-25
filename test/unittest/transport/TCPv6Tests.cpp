@@ -220,16 +220,16 @@ TEST_F(TCPv6Tests, autofill_port)
 // process this lead to overwriting server's channel resources map elements.
 TEST_F(TCPv6Tests, client_announced_local_port_uniqueness)
 {
-    TCPv6TransportDescriptor recvDescriptor;
+    eprosima::fastdds::rtps::TCPv6TransportDescriptor recvDescriptor;
     recvDescriptor.add_listener_port(g_default_port);
     MockTCPv6Transport receiveTransportUnderTest(recvDescriptor);
     receiveTransportUnderTest.init();
 
-    TCPv6TransportDescriptor sendDescriptor_1;
+    eprosima::fastdds::rtps::TCPv6TransportDescriptor sendDescriptor_1;
     TCPv6Transport sendTransportUnderTest_1(sendDescriptor_1);
     sendTransportUnderTest_1.init();
 
-    TCPv6TransportDescriptor sendDescriptor_2;
+    eprosima::fastdds::rtps::TCPv6TransportDescriptor sendDescriptor_2;
     TCPv6Transport sendTransportUnderTest_2(sendDescriptor_2);
     sendTransportUnderTest_2.init();
 
@@ -239,11 +239,11 @@ TEST_F(TCPv6Tests, client_announced_local_port_uniqueness)
     outputLocator.port = g_default_port;
     IPLocator::setLogicalPort(outputLocator, 7610);
 
-    SendResourceList send_resource_list_1;
+    eprosima::fastdds::rtps::SendResourceList send_resource_list_1;
     ASSERT_TRUE(sendTransportUnderTest_1.OpenOutputChannel(send_resource_list_1, outputLocator));
     ASSERT_FALSE(send_resource_list_1.empty());
 
-    SendResourceList send_resource_list_2;
+    eprosima::fastdds::rtps::SendResourceList send_resource_list_2;
     ASSERT_TRUE(sendTransportUnderTest_2.OpenOutputChannel(send_resource_list_2, outputLocator));
     ASSERT_FALSE(send_resource_list_2.empty());
 
