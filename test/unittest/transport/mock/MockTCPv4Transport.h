@@ -40,6 +40,16 @@ public:
         return channel_resources_;
     }
 
+    const std::vector<asio::ip::address_v4>& get_interface_whitelist() const
+    {
+        return interface_whitelist_;
+    }
+
+    const std::map<Locator_t, std::shared_ptr<fastdds::rtps::TCPAcceptor>>& get_acceptors_map() const
+    {
+        return acceptors_;
+    }
+
 };
 
 } // namespace rtps
