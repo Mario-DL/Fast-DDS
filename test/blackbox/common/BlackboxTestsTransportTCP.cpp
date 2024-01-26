@@ -756,22 +756,22 @@ TEST(TransportTCP, TCPv4_transport_sanitizer)
 
     // Client
     auto initialize_client = [&]() -> PubSubWriter<HelloWorldPubSubType>*
-    {
-        auto client_transport = std::make_shared<TCPv4TransportDescriptor>();
-        client->disable_builtin_transport().add_user_transport_to_pparams(client_transport);
-        Locator_t initialPeerLocator;
-        initialPeerLocator.kind = LOCATOR_KIND_TCPv4;
-        IPLocator::setIPv6(initialPeerLocator, "::1");
-        initialPeerLocator.port = server_port;
-        LocatorList_t initial_peer_list;
-        initial_peer_list.push_back(initialPeerLocator);
-        client->initial_peers(initial_peer_list);
-        client->init();
-        return client;
-    };
+            {
+                auto client_transport = std::make_shared<TCPv4TransportDescriptor>();
+                client->disable_builtin_transport().add_user_transport_to_pparams(client_transport);
+                Locator_t initialPeerLocator;
+                initialPeerLocator.kind = LOCATOR_KIND_TCPv4;
+                IPLocator::setIPv6(initialPeerLocator, "::1");
+                initialPeerLocator.port = server_port;
+                LocatorList_t initial_peer_list;
+                initial_peer_list.push_back(initialPeerLocator);
+                client->initial_peers(initial_peer_list);
+                client->init();
+                return client;
+            };
     client = initialize_client();
     ASSERT_TRUE(client->isInitialized());
-    
+
     // Wait for discovery. OpenOutputChannel() is called.
     client->wait_discovery();
     server->wait_discovery();
@@ -794,12 +794,12 @@ TEST(TransportTCP, TCPv4_transport_sanitizer)
     // Wait for discovery. OpenOutputChannel() is called and we can update the senders.
     client->wait_discovery();
     server->wait_discovery();
-    
+
     // Check that the send_resource_list has size 1. This means that the sanitizer has removed the
     // send resource for the first client and now has a send resource for the second client.
     send_resource_list = server_transport->get_send_resource_list();
     ASSERT_TRUE(send_resource_list.size() == 1);
-    
+
     // Release TCP client and server resources.
     delete client;
     delete server;
@@ -828,22 +828,22 @@ TEST(TransportTCP, TCPv6_transport_sanitizer)
 
     // Client
     auto initialize_client = [&]() -> PubSubWriter<HelloWorldPubSubType>*
-    {
-        auto client_transport = std::make_shared<TCPv4TransportDescriptor>();
-        client->disable_builtin_transport().add_user_transport_to_pparams(client_transport);
-        Locator_t initialPeerLocator;
-        initialPeerLocator.kind = LOCATOR_KIND_TCPv4;
-        IPLocator::setIPv4(initialPeerLocator, 127, 0, 0, 1);
-        initialPeerLocator.port = server_port;
-        LocatorList_t initial_peer_list;
-        initial_peer_list.push_back(initialPeerLocator);
-        client->initial_peers(initial_peer_list);
-        client->init();
-        return client;
-    };
+            {
+                auto client_transport = std::make_shared<TCPv4TransportDescriptor>();
+                client->disable_builtin_transport().add_user_transport_to_pparams(client_transport);
+                Locator_t initialPeerLocator;
+                initialPeerLocator.kind = LOCATOR_KIND_TCPv4;
+                IPLocator::setIPv4(initialPeerLocator, 127, 0, 0, 1);
+                initialPeerLocator.port = server_port;
+                LocatorList_t initial_peer_list;
+                initial_peer_list.push_back(initialPeerLocator);
+                client->initial_peers(initial_peer_list);
+                client->init();
+                return client;
+            };
     client = initialize_client();
     ASSERT_TRUE(client->isInitialized());
-    
+
     // Wait for discovery. OpenOutputChannel() is called.
     client->wait_discovery();
     server->wait_discovery();
@@ -866,12 +866,12 @@ TEST(TransportTCP, TCPv6_transport_sanitizer)
     // Wait for discovery. OpenOutputChannel() is called and we can update the senders.
     client->wait_discovery();
     server->wait_discovery();
-    
+
     // Check that the send_resource_list has size 1. This means that the sanitizer has removed the
     // send resource for the first client and now has a send resource for the second client.
     send_resource_list = server_transport->get_send_resource_list();
     ASSERT_TRUE(send_resource_list.size() == 1);
-    
+
     // Release TCP client and server resources.
     delete client;
     delete server;

@@ -470,7 +470,7 @@ public:
     }
 
     /**
-     * Check and update send resource list. 
+     * Check and update send resource list.
      */
     bool sanitize_transport(
             SendResourceList& send_resource_list) const;
