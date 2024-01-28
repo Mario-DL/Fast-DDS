@@ -37,7 +37,19 @@
 #include <map>
 #include <sstream>
 
+
 namespace eprosima {
+
+namespace fastdds {
+namespace dds {
+namespace builtin {
+
+class TypeLookupManager;
+
+} // namespace builtin
+} // namespace dds
+} // namespace fastdds
+
 namespace fastrtps {
 namespace rtps {
 
@@ -330,6 +342,10 @@ public:
     MOCK_METHOD(bool, should_match_local_endpoints, ());
 
     MOCK_METHOD(bool, ignore_participant, (const GuidPrefix_t&));
+
+    MOCK_METHOD0(has_shm_transport, bool());
+
+    MOCK_METHOD0(typelookup_manager, fastdds::dds::builtin::TypeLookupManager* ());
 
 private:
 

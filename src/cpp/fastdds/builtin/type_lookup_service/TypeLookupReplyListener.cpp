@@ -20,6 +20,7 @@
 #include <fastdds/builtin/type_lookup_service/TypeLookupReplyListener.hpp>
 
 #include <fastdds/dds/log/Log.hpp>
+#include <fastrtps/rtps/reader/RTPSReader.h>
 
 #include <fastdds/builtin/type_lookup_service/TypeLookupManager.hpp>
 #include <rtps/participant/RTPSParticipantImpl.h>

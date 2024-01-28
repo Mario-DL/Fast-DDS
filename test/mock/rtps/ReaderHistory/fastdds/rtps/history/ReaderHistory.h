@@ -21,7 +21,9 @@
 
 #include <fastrtps/rtps/common/CacheChange.h>
 #include <fastrtps/rtps/attributes/HistoryAttributes.h>
+#include <fastdds/rtps/writer/ChangeForReader.h>
 #include <fastdds/dds/core/status/SampleRejectedStatus.hpp>
+#include <fastrtps/utils/collections/ResourceLimitedVector.hpp>
 #include <fastrtps/utils/TimedMutex.hpp>
 
 #include <mutex>
@@ -67,6 +69,11 @@ public:
             CacheChange_t** change));
 
     MOCK_METHOD1(add_change_mock, bool(CacheChange_t*));
+
+    MOCK_METHOD1(find_change, const_iterator(CacheChange_t*));
+
+    MOCK_METHOD2(remove_change, iterator(const_iterator, bool));
+
     // *INDENT-ON*
 
     bool add_change(
