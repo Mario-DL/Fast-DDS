@@ -39,7 +39,6 @@
 #include <fastdds/rtps/transport/test_UDPv4TransportDescriptor.h>
 #include <fastrtps/utils/TimeConversion.h>
 #include <rtps/transport/test_UDPv4Transport.h>
-#include <fastrtps/types/TypesBase.h>
 
 #include "BlackboxTests.hpp"
 #include "../api/dds-pim/CustomPayloadPool.hpp"
