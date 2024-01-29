@@ -23,18 +23,14 @@
 #include <thread>
 
 #include <fastdds/dds/log/Log.hpp>
+#include <fastdds/dds/xtypes/dynamic_types/DynamicDataFactory.hpp>
+#include <fastdds/dds/xtypes/dynamic_types/DynamicTypeBuilderFactory.hpp>
 #include <fastdds/rtps/RTPSDomain.h>
 #include <fastdds/rtps/participant/RTPSParticipant.h>
 
 #include <fastrtps/participant/Participant.h>
 #include <fastrtps/publisher/Publisher.h>
 #include <fastrtps/subscriber/Subscriber.h>
-#include <fastrtps/types/DynamicPubSubType.h>
-#include <fastrtps/types/TypeObjectFactory.h>
-#include <fastrtps/types/DynamicDataFactory.h>
-#include <fastrtps/types/DynamicType.h>
-#include <fastrtps/types/DynamicTypeBuilderFactory.h>
-#include <fastrtps/types/DynamicTypeMember.h>
 #include <fastrtps/xmlparser/XMLProfileManager.h>
 
 #include <fastrtps_deprecated/participant/ParticipantImpl.h>
@@ -76,8 +72,8 @@ void Domain::stopAll()
     }
 
     // Deletes DynamicTypes and TypeObject factories
-    types::DynamicTypeBuilderFactory::delete_instance();
-    types::DynamicDataFactory::delete_instance();
+    fastdds::dds::DynamicDataFactory::delete_instance();
+    fastdds::dds::DynamicTypeBuilderFactory::delete_instance();
     XMLProfileManager::DeleteInstance();
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
