@@ -144,7 +144,6 @@ set(${PROJECT_NAME}_source_files
     rtps/transport/UDPv6Transport.cpp
 
     dynamic-types/AnnotationDescriptor.cpp
-    dynamic-types/AnnotationParameterValue.cpp
     dynamic-types/DynamicData.cpp
     dynamic-types/DynamicDataFactory.cpp
     dynamic-types/DynamicType.cpp
@@ -157,14 +156,6 @@ set(${PROJECT_NAME}_source_files
     dynamic-types/DynamicTypeMember.cpp
     dynamic-types/MemberDescriptor.cpp
     dynamic-types/TypeDescriptor.cpp
-    dynamic-types/TypeIdentifier.cpp
-    dynamic-types/TypeIdentifierTypes.cpp
-    dynamic-types/TypeObject.cpp
-    dynamic-types/TypeObjectHashId.cpp
-    dynamic-types/TypeObjectFactory.cpp
-    dynamic-types/TypeNamesGenerator.cpp
-    dynamic-types/TypesBase.cpp
-    dynamic-types/BuiltinAnnotationsTypeObject.cpp
     dynamic-types/DynamicDataHelper.cpp
 
     fastdds/xtypes/exception/Exception.cpp
@@ -270,8 +261,10 @@ if (FASTDDS_STATISTICS)
         statistics/rtps/reader/StatisticsReaderImpl.cpp
         statistics/rtps/StatisticsBase.cpp
         statistics/rtps/writer/StatisticsWriterImpl.cpp
-        statistics/types/typesPubSubTypes.cxx
         statistics/types/monitorservice_typesPubSubTypes.cxx
+        statistics/types/monitorservice_typesTypeObjectSupport.cxx
+        statistics/types/typesPubSubTypes.cxx
+        statistics/types/typesTypeObjectSupport.cxx
         )
 
     list(APPEND ${PROJECT_NAME}_source_files

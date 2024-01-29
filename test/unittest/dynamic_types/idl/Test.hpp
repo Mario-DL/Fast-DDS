@@ -33,8 +33,6 @@
 #include <fastcdr/exceptions/BadParamException.h>
 
 
-#include "TestTypeObject.h"
-
 #if defined(_WIN32)
 #if defined(EPROSIMA_USER_DLL_EXPORT)
 #define eProsima_user_DllExport __declspec( dllexport )
@@ -75,8 +73,6 @@ typedef MyAliasEnum MyAliasEnum2;
 
 typedef MyAliasEnum2 MyAliasEnum3;
 
-
-
 /*!
  * @brief This class represents the structure BasicStruct defined by the user in the IDL file.
  * @ingroup Test
@@ -90,8 +86,6 @@ public:
      */
     eProsima_user_DllExport BasicStruct()
     {
-        // Just to register all known types
-        registerTestTypes();
     }
 
     /*!
@@ -666,8 +660,6 @@ typedef std::array<int32_t, 2> MyMiniArray;
 
 typedef std::vector<int32_t> MySequenceLong;
 
-
-
 /*!
  * @brief This class represents the structure ComplexStruct defined by the user in the IDL file.
  * @ingroup Test
@@ -681,8 +673,6 @@ public:
      */
     eProsima_user_DllExport ComplexStruct()
     {
-        // Just to register all known types
-        registerTestTypes();
     }
 
     /*!
@@ -1666,8 +1656,6 @@ private:
     std::array<MySequenceLong, 23> m_my_sequences_array;
 
 };
-
-
 /*!
  * @brief This class represents the union MyUnion defined by the user in the IDL file.
  * @ingroup Test
@@ -2074,8 +2062,6 @@ private:
     BasicStruct m_basic;
     ComplexStruct m_complex;
 };
-
-
 /*!
  * @brief This class represents the union MyUnion2 defined by the user in the IDL file.
  * @ingroup Test
@@ -2562,8 +2548,6 @@ private:
     std::string m_imString;
     int32_t m_tres{0};
 };
-
-
 /*!
  * @brief This class represents the structure CompleteStruct defined by the user in the IDL file.
  * @ingroup Test
@@ -2577,8 +2561,6 @@ public:
      */
     eProsima_user_DllExport CompleteStruct()
     {
-        // Just to register all known types
-        registerTestTypes();
     }
 
     /*!
@@ -2746,8 +2728,6 @@ private:
     MyUnion2 m_my_union_2;
 
 };
-
-
 /*!
  * @brief This class represents the structure KeyedStruct defined by the user in the IDL file.
  * @ingroup Test
@@ -2761,8 +2741,6 @@ public:
      */
     eProsima_user_DllExport KeyedStruct()
     {
-        // Just to register all known types
-        registerTestTypes();
     }
 
     /*!

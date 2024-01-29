@@ -58,8 +58,8 @@ const typename TWaitSet<DELEGATE>::ConditionSeq TWaitSet<DELEGATE>::wait()
 
 template<typename DELEGATE>
 typename TWaitSet<DELEGATE>::ConditionSeq& TWaitSet<DELEGATE>::wait(
-    ConditionSeq& /*triggered*/,
-    const dds::core::Duration& /*timeout*/)
+        ConditionSeq& /*triggered*/,
+        const dds::core::Duration& /*timeout*/)
 {
     //    this->delegate()->wait(triggered, timeout);
     //    return triggered;
@@ -67,7 +67,7 @@ typename TWaitSet<DELEGATE>::ConditionSeq& TWaitSet<DELEGATE>::wait(
 
 template<typename DELEGATE>
 typename TWaitSet<DELEGATE>::ConditionSeq& TWaitSet<DELEGATE>::wait(
-    ConditionSeq & triggered)
+        ConditionSeq& triggered)
 {
     this->wait(triggered, dds::core::Duration::infinite());
     return triggered;
@@ -119,7 +119,7 @@ bool TWaitSet<DELEGATE>::detach_condition(
         const Condition& /*cond*/)
 {
     //    if (this->delegate()->detach_condition(cond.delegate().get()) ==
-    //            eprosima::fastrtps::types::ReturnCode_t::RETCODE_OK)
+    //            RETCODE_OK)
     //    {
     //        return true;
     //    }
@@ -135,7 +135,7 @@ const typename TWaitSet<DELEGATE>::ConditionSeq TWaitSet<DELEGATE>::conditions()
 
 template<typename DELEGATE>
 typename TWaitSet<DELEGATE>::ConditionSeq& TWaitSet<DELEGATE>::conditions(
-    ConditionSeq& /*conds*/) const
+        ConditionSeq& /*conds*/) const
 {
     //    this->delegate()->get_conditions(conds);
     //    return conds;
