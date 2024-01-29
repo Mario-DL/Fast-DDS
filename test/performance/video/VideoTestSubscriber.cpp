@@ -136,6 +136,7 @@ bool VideoTestSubscriber::init(
         if (m_forcedDomain >= 0)
         {
             ParticipantAttributes participant_att;
+            // TODO(jlbueno): Migrate to DomainParticipantFactory::get_participant_qos_from_profile
             if (eprosima::fastrtps::xmlparser::XMLP_ret::XML_OK ==
                     eprosima::fastrtps::xmlparser::XMLProfileManager::fillParticipantAttributes(participant_profile_name,
                     participant_att))
@@ -178,6 +179,7 @@ bool VideoTestSubscriber::init(
 
     if (m_sXMLConfigFile.length() > 0)
     {
+        // TODO(jlbueno): migrate to Publisher::get_datareader_qos_from_profile
         eprosima::fastrtps::xmlparser::XMLProfileManager::fillSubscriberAttributes(profile_name, SubDataparam);
     }
 
