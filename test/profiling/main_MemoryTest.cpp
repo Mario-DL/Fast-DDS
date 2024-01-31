@@ -22,9 +22,6 @@
 
 #include <optionparser.hpp>
 
-#include <fastdds/dds/log/Log.hpp>
-#include <fastrtps/Domain.h>
-#include <fastrtps/fastrtps_dll.h>
 #include <fastrtps/xmlparser/XMLProfileManager.h>
 
 #include "MemoryTestPublisher.h"
