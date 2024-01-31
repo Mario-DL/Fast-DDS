@@ -97,7 +97,9 @@ TypeLookupManager::~TypeLookupManager()
     delete builtin_reply_reader_history_;
 
     delete reply_listener_;
+    delete reply_wlistener_;
     delete request_listener_;
+    delete request_wlistener_;
 
     delete temp_reader_proxy_data_;
     delete temp_writer_proxy_data_;
@@ -504,13 +506,14 @@ bool TypeLookupManager::create_endpoints()
 
     // Built-in request writer
     builtin_request_writer_history_ = new WriterHistory(hatt);
+    request_wlistener_ = new TypeLookupRequestWListener(this);
 
     RTPSWriter* req_writer;
     if (participant_->createWriter(
                 &req_writer,
                 watt,
                 builtin_request_writer_history_,
-                nullptr,
+                request_wlistener_,
                 fastrtps::rtps::c_EntityId_TypeLookup_request_writer,
                 true))
     {
@@ -522,18 +525,21 @@ bool TypeLookupManager::create_endpoints()
         EPROSIMA_LOG_ERROR(TYPELOOKUP_SERVICE, "Typelookup request writer creation failed.");
         delete builtin_request_writer_history_;
         builtin_request_writer_history_ = nullptr;
+        delete request_wlistener_;
+        request_wlistener_ = nullptr;
         return false;
     }
 
     // Built-in reply writer
     builtin_reply_writer_history_ = new WriterHistory(hatt);
+    reply_wlistener_ = new TypeLookupReplyWListener(this);
 
     RTPSWriter* rep_writer;
     if (participant_->createWriter(
                 &rep_writer,
                 watt,
                 builtin_reply_writer_history_,
-                nullptr,
+                reply_wlistener_,
                 fastrtps::rtps::c_EntityId_TypeLookup_reply_writer,
                 true))
     {
@@ -545,6 +551,8 @@ bool TypeLookupManager::create_endpoints()
         EPROSIMA_LOG_ERROR(TYPELOOKUP_SERVICE, "Typelookup reply writer creation failed.");
         delete builtin_reply_writer_history_;
         builtin_reply_writer_history_ = nullptr;
+        delete reply_wlistener_;
+        reply_wlistener_ = nullptr;
         return false;
     }
 
@@ -698,7 +706,7 @@ bool TypeLookupManager::send_impl(
     }
 
     // Serialize the message using the provided PubSubType
-    bool result = pubsubtype->serialize(&msg, &payload, DataRepresentationId_t::XCDR2_DATA_REPRESENTATION);
+    bool result = pubsubtype->serialize(&msg, &payload, DataRepresentationId_t::XCDR_DATA_REPRESENTATION);
     // If serialization was successful, update the change and add it to the WriterHistory
     if (result)
     {
@@ -815,6 +823,18 @@ std::string TypeLookupManager::get_instance_name(
             });
     str.erase(std::remove(str.begin(), str.end(), '.'), str.end());
     return "dds.builtin.TOS." + str;
+}
+
+void TypeLookupManager::remove_builtin_request_writer_history_change(
+        fastrtps::rtps::CacheChange_t* change)
+{
+    builtin_request_writer_history_->remove_change(change);
+}
+
+void TypeLookupManager::remove_builtin_reply_writer_history_change(
+        fastrtps::rtps::CacheChange_t* change)
+{
+    builtin_reply_writer_history_->remove_change(change);
 }
 
 } // namespace builtin

@@ -302,6 +302,13 @@ void TypeLookupReplyListener::onNewCacheChangeAdded(
     reader->getHistory()->remove_change(change);
 }
 
+void TypeLookupReplyWListener::onWriterChangeReceivedByAll(
+        fastrtps::rtps::RTPSWriter*,
+        fastrtps::rtps::CacheChange_t* change)
+{
+    typelookup_manager_->remove_builtin_reply_writer_history_change(change);
+}
+
 } // namespace builtin
 
 } // namespace dds
