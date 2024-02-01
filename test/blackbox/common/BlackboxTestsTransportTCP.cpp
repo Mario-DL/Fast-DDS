@@ -877,6 +877,134 @@ TEST(TransportTCP, TCPv6_transport_sanitizer)
     delete server;
 }
 
+// This test verifies that if having a server with several listening ports and a client that connects to
+// to one of the listening ports. When client connects, it will consequently create only one new send
+// resource. This send resource will be used to send data to the server.
+TEST(TransportTCP, TCPv4_multiple_listening_ports)
+{
+    using eprosima::fastdds::rtps::DatagramInjectionTransportDescriptor;
+
+    // Server
+    PubSubReader<HelloWorldPubSubType>* server = new PubSubReader<HelloWorldPubSubType>(TEST_TOPIC_NAME);
+    // Listening ports adding order matters. It is when connecting to other than the first listening port
+    // when more than one send resource is created. We will additionally add a listening port after the one
+    // used. This will prevent possible errors coming from distributing as own locator the first or last
+    // listening port added.
+    uint16_t server_port_unused_1 = 10000;
+    uint16_t server_port_used = 10001;
+    uint16_t server_port_unused_2 = 10002;
+    auto server_transport = std::make_shared<TCPv4TransportDescriptor>();
+    server_transport->add_listener_port(server_port_unused_1);
+    server_transport->add_listener_port(server_port_used);
+    server_transport->add_listener_port(server_port_unused_2);
+    server->disable_builtin_transport().add_user_transport_to_pparams(server_transport).init();
+    ASSERT_TRUE(server->isInitialized());
+
+    // Client
+    // Create a client with a DatagramInjectionTransportDescriptor which heritates from
+    // ChainingTransportDescriptor. This will allow us to get send_resource_list_ from the
+    // client participant when its transport gets its OpenOutputChannel() method called.
+    PubSubWriter<HelloWorldPubSubType>* client = new PubSubWriter<HelloWorldPubSubType>(TEST_TOPIC_NAME);
+    auto low_level_client_transport = std::make_shared<TCPv4TransportDescriptor>();
+    auto client_transport = std::make_shared<DatagramInjectionTransportDescriptor>(low_level_client_transport);
+    client->disable_builtin_transport().add_user_transport_to_pparams(client_transport);
+    Locator_t initialPeerLocator;
+    initialPeerLocator.kind = LOCATOR_KIND_TCPv4;
+    IPLocator::setIPv4(initialPeerLocator, 127,0,0,1);
+    initialPeerLocator.port = server_port_used;
+    LocatorList_t initial_peer_list;
+    initial_peer_list.push_back(initialPeerLocator);
+    client->initial_peers(initial_peer_list);
+    client->init(); 
+    ASSERT_TRUE(client->isInitialized());
+
+    // Wait for discovery. OpenOutputChannel() is called.
+    client->wait_discovery();
+    server->wait_discovery();
+
+    // We can only update the senders when OpenOutputChannel() is called.
+    auto send_resource_list = client_transport->get_send_resource_list();
+    ASSERT_TRUE(send_resource_list.size() == 1);
+
+    auto data = default_helloworld_data_generator();
+
+    server->startReception(data);
+    // Send data
+    client->send(data);
+    // In this test all data should be sent.
+    ASSERT_TRUE(data.empty());
+    // Block server until reception finished or timeout.
+    server->block_for_at_least(2);
+
+    // Release TCP client and server resources.
+    delete client;
+    delete server;
+}
+
+// This test verifies that if having a server with several listening ports and a client that connects to
+// to one of the listening ports. When client connects, it will consequently create only one new send
+// resource. This send resource will be used to send data to the server.
+TEST(TransportTCP, TCPv6_multiple_listening_ports)
+{
+    using eprosima::fastdds::rtps::DatagramInjectionTransportDescriptor;
+
+    // Server
+    PubSubReader<HelloWorldPubSubType>* server = new PubSubReader<HelloWorldPubSubType>(TEST_TOPIC_NAME);
+    // Listening ports adding order matters. It is when connecting to other than the first listening port
+    // when more than one send resource is created. We will additionally add a listening port after the one
+    // used. This will prevent possible errors coming from distributing as own locator the first or last
+    // listening port added.
+    uint16_t server_port_unused_1 = 10000;
+    uint16_t server_port_used = 10001;
+    uint16_t server_port_unused_2 = 10002;
+    auto server_transport = std::make_shared<TCPv6TransportDescriptor>();
+    server_transport->add_listener_port(server_port_unused_1);
+    server_transport->add_listener_port(server_port_used);
+    server_transport->add_listener_port(server_port_unused_2);
+    server->disable_builtin_transport().add_user_transport_to_pparams(server_transport).init();
+    ASSERT_TRUE(server->isInitialized());
+
+    // Client
+    // Create a client with a DatagramInjectionTransportDescriptor which heritates from
+    // ChainingTransportDescriptor. This will allow us to get send_resource_list_ from the
+    // client participant when its transport gets its OpenOutputChannel() method called.
+    PubSubWriter<HelloWorldPubSubType>* client = new PubSubWriter<HelloWorldPubSubType>(TEST_TOPIC_NAME);
+    auto low_level_client_transport = std::make_shared<TCPv6TransportDescriptor>();
+    auto client_transport = std::make_shared<DatagramInjectionTransportDescriptor>(low_level_client_transport);
+    client->disable_builtin_transport().add_user_transport_to_pparams(client_transport);
+    Locator_t initialPeerLocator;
+    initialPeerLocator.kind = LOCATOR_KIND_TCPv6;
+    IPLocator::setIPv6(initialPeerLocator, "::1");
+    initialPeerLocator.port = server_port_used;
+    LocatorList_t initial_peer_list;
+    initial_peer_list.push_back(initialPeerLocator);
+    client->initial_peers(initial_peer_list);
+    client->init(); 
+    ASSERT_TRUE(client->isInitialized());
+
+    // Wait for discovery. OpenOutputChannel() is called.
+    client->wait_discovery();
+    server->wait_discovery();
+
+    // We can only update the senders when OpenOutputChannel() is called.
+    auto send_resource_list = client_transport->get_send_resource_list();
+    ASSERT_TRUE(send_resource_list.size() == 1);
+
+    auto data = default_helloworld_data_generator();
+
+    server->startReception(data);
+    // Send data
+    client->send(data);
+    // In this test all data should be sent.
+    ASSERT_TRUE(data.empty());
+    // Block server until reception finished or timeout.
+    server->block_for_at_least(2);
+
+    // Release TCP client and server resources.
+    delete client;
+    delete server;
+}
+
 #ifdef INSTANTIATE_TEST_SUITE_P
 #define GTEST_INSTANTIATE_TEST_MACRO(x, y, z, w) INSTANTIATE_TEST_SUITE_P(x, y, z, w)
 #else
