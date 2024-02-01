@@ -755,6 +755,28 @@ bool TCPTransportInterface::OpenOutputChannel(
         }
         else
         {
+            // At this point, we have to create a new connecting channel if the locator is included in the initial peers.
+            // If there are no initial peers, we assume that the connecting peer was supposed to be discovered by other means.
+            if (!initial_peers_.empty())
+            {
+                if (std::find(initial_peers_.begin(), initial_peers_.end(),
+                            physical_locator) == initial_peers_.end())
+                {
+                    // Maybe as WAN?
+                    if(IPLocator::hasWan(physical_locator) && (std::find(initial_peers_.begin(), initial_peers_.end(),
+                            IPLocator::WanToLanLocator(physical_locator)) == initial_peers_.end()))
+                    {
+                        // Locator not found in initial peers list.
+                        return false;
+                    }
+                    else
+                    {
+                        // Locator not found in initial peers list.
+                        return false;
+                    }
+                }
+            }
+
             // Create output channel
             EPROSIMA_LOG_INFO(OpenOutputChannel, "OpenOutputChannel (physical: "
                     << IPLocator::getPhysicalPort(locator) << "; logical: "
@@ -1496,11 +1518,26 @@ bool TCPTransportInterface::getDefaultMetatrafficUnicastLocators(
         LocatorList& locators,
         uint32_t metatraffic_unicast_port) const
 {
-    Locator locator;
-    locator.kind = transport_kind_;
-    locator.set_Invalid_Address();
-    fillMetatrafficUnicastLocator(locator, metatraffic_unicast_port);
-    locators.push_back(locator);
+    if (configuration()->listening_ports.empty())
+    {
+        Locator locator;
+        locator.kind = transport_kind_;
+        locator.set_Invalid_Address();
+        fillMetatrafficUnicastLocator(locator, metatraffic_unicast_port);
+        locators.push_back(locator);
+    }
+    else
+    {
+        for (const auto& port : configuration()->listening_ports)
+        {
+            Locator locator;
+            locator.kind = transport_kind_;
+            locator.set_Invalid_Address();
+            IPLocator::setPhysicalPort(locator, port);
+            fillMetatrafficUnicastLocator(locator, metatraffic_unicast_port);
+            locators.push_back(locator);
+        }
+    }
     return true;
 }
 
@@ -1508,11 +1545,26 @@ bool TCPTransportInterface::getDefaultUnicastLocators(
         LocatorList& locators,
         uint32_t unicast_port) const
 {
-    Locator locator;
-    locator.kind = transport_kind_;
-    locator.set_Invalid_Address();
-    fillUnicastLocator(locator, unicast_port);
-    locators.push_back(locator);
+    if (configuration()->listening_ports.empty())
+    {
+        Locator locator;
+        locator.kind = transport_kind_;
+        locator.set_Invalid_Address();
+        fillUnicastLocator(locator, unicast_port);
+        locators.push_back(locator);
+    }
+    else
+    {
+        for (const auto& port : configuration()->listening_ports)
+        {
+            Locator locator;
+            locator.kind = transport_kind_;
+            locator.set_Invalid_Address();
+            IPLocator::setPhysicalPort(locator, port);
+            fillUnicastLocator(locator, unicast_port);
+            locators.push_back(locator);
+        }
+    }
     return true;
 }
 
@@ -1560,6 +1612,7 @@ bool TCPTransportInterface::configureInitialPeerLocator(
             }
 
             list.push_back(auxloc);
+            initial_peers_.push_back(IPLocator::toPhysicalLocator(auxloc));
         }
     }
     else
@@ -1571,11 +1624,13 @@ bool TCPTransportInterface::configureInitialPeerLocator(
                 Locator auxloc(locator);
                 IPLocator::setLogicalPort(auxloc, static_cast<uint16_t>(port_params.getUnicastPort(domainId, i)));
                 list.push_back(auxloc);
+                initial_peers_.push_back(IPLocator::toPhysicalLocator(auxloc));
             }
         }
         else
         {
             list.push_back(locator);
+            initial_peers_.push_back(IPLocator::toPhysicalLocator(locator));
         }
     }
 
