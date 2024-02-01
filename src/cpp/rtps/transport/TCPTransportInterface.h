@@ -141,13 +141,12 @@ protected:
 
     void calculate_crc(
             TCPHeader& header,
-            const fastrtps::rtps::octet* data,
-            uint32_t size) const;
+            const std::list<NetworkBuffer>& buffers) const;
 
     void fill_rtcp_header(
             TCPHeader& header,
-            const fastrtps::rtps::octet* send_buffer,
-            uint32_t send_buffer_size,
+            const std::list<NetworkBuffer>& buffers,
+            uint32_t total_bytes,
             uint16_t logical_port) const;
 
     //! Closes the given p_channel_resource and unbind it from every resource.
@@ -209,8 +208,8 @@ protected:
      * Send a buffer to a destination
      */
     bool send(
-            const fastrtps::rtps::octet* send_buffer,
-            uint32_t send_buffer_size,
+            const std::list<NetworkBuffer>& buffers,
+            uint32_t total_bytes,
             std::shared_ptr<TCPChannelResource>& channel,
             const Locator& remote_locator);
 
@@ -351,8 +350,8 @@ public:
 
     /**
      * Blocking Send through the specified channel.
-     * @param send_buffer Slice into the raw data to send.
-     * @param send_buffer_size Size of the raw data. It will be used as a bounds check for the previous argument.
+     * @param buffers List of buffers to send.
+     * @param total_bytes Total amount of bytes to send. It will be used as a bounds check for the previous argument.
      * It must not exceed the send_buffer_size fed to this class during construction.
      * @param channel channel we're sending from.
      * @param destination_locators_begin pointer to destination locators iterator begin, the iterator can be advanced inside this fuction
@@ -361,8 +360,8 @@ public:
      * so should not be reuse.
      */
     bool send(
-            const fastrtps::rtps::octet* send_buffer,
-            uint32_t send_buffer_size,
+            const std::list<NetworkBuffer>& buffers,
+            uint32_t total_bytes,
             std::shared_ptr<TCPChannelResource>& channel,
             fastrtps::rtps::LocatorsIterator* destination_locators_begin,
             fastrtps::rtps::LocatorsIterator* destination_locators_end);
