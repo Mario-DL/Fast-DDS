@@ -910,12 +910,12 @@ TEST(TransportTCP, TCPv4_multiple_listening_ports)
     client->disable_builtin_transport().add_user_transport_to_pparams(client_transport);
     Locator_t initialPeerLocator;
     initialPeerLocator.kind = LOCATOR_KIND_TCPv4;
-    IPLocator::setIPv4(initialPeerLocator, 127,0,0,1);
+    IPLocator::setIPv4(initialPeerLocator, 127, 0, 0, 1);
     initialPeerLocator.port = server_port_used;
     LocatorList_t initial_peer_list;
     initial_peer_list.push_back(initialPeerLocator);
     client->initial_peers(initial_peer_list);
-    client->init(); 
+    client->init();
     ASSERT_TRUE(client->isInitialized());
 
     // Wait for discovery. OpenOutputChannel() is called.
@@ -979,7 +979,7 @@ TEST(TransportTCP, TCPv6_multiple_listening_ports)
     LocatorList_t initial_peer_list;
     initial_peer_list.push_back(initialPeerLocator);
     client->initial_peers(initial_peer_list);
-    client->init(); 
+    client->init();
     ASSERT_TRUE(client->isInitialized());
 
     // Wait for discovery. OpenOutputChannel() is called.

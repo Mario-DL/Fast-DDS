@@ -760,10 +760,10 @@ bool TCPTransportInterface::OpenOutputChannel(
             if (!initial_peers_.empty())
             {
                 if (std::find(initial_peers_.begin(), initial_peers_.end(),
-                            physical_locator) == initial_peers_.end())
+                        physical_locator) == initial_peers_.end())
                 {
                     // Maybe as WAN?
-                    if(IPLocator::hasWan(physical_locator) && (std::find(initial_peers_.begin(), initial_peers_.end(),
+                    if (IPLocator::hasWan(physical_locator) && (std::find(initial_peers_.begin(), initial_peers_.end(),
                             IPLocator::WanToLanLocator(physical_locator)) == initial_peers_.end()))
                     {
                         // Locator not found in initial peers list.
