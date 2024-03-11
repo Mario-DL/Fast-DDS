@@ -849,6 +849,10 @@ bool MessageReceiver::proc_Submsg_Data(
         // Prevent integer overflow of variable payload_size
         if (smh->submessageLength < submsg_no_payload_size)
         {
+            EPROSIMA_LOG_WARNING(RTPS_MSG_IN, IDSTRING "Serialized Payload avoided overflow "
+                    "(" << smh->submessageLength << "/" << submsg_no_payload_size << ")");
+            ch.serializedPayload.data = nullptr;
+            ch.inline_qos.data = nullptr;
             return false;
         }
 
