@@ -861,7 +861,7 @@ inline bool CDRMessage::addPropertySeq(
 inline bool CDRMessage::readPropertySeq(
         CDRMessage_t* msg,
         PropertySeq& properties,
-        const uint32_t& parameter_length)
+        const uint32_t parameter_length)
 {
     assert(msg);
 
@@ -871,10 +871,9 @@ inline bool CDRMessage::readPropertySeq(
         return false;
     }
 
-    //! Length should be, at least 16 times the number of elements
-    //! 8 bytes for each string header and 8 bytes padding
-    if (parameter_length != 0 &&
-            16 * length > parameter_length)
+    // Length should be at least 16 times the number of elements, since each property contains
+    // 2 empty strings, each with 4 bytes for its length + at least 4 bytes of data (single NUL character + padding)
+    if (16 * length > parameter_length)
     {
         return false;
     }
@@ -972,7 +971,7 @@ inline bool CDRMessage::addBinaryPropertySeq(
 inline bool CDRMessage::readBinaryPropertySeq(
         CDRMessage_t* msg,
         BinaryPropertySeq& binary_properties,
-        const uint32_t& parameter_length)
+        const uint32_t parameter_length)
 {
     assert(msg);
 
@@ -982,10 +981,10 @@ inline bool CDRMessage::readBinaryPropertySeq(
         return false;
     }
 
-    //! Length should be, at least 16 times the number of elements
-    //! 8 bytes for each string header and 8 bytes padding
-    if (parameter_length != 0 &&
-            16 * length > parameter_length)
+    // Length should be at least 12 times the number of elements, since each each property contains at least
+    // 1 empty string with 4 bytes for its length + at least 4 bytes of data (single NUL character + padding) and
+    // 1 empty byte sequence with 4 bytes for its length
+    if (12 * length > parameter_length)
     {
         return false;
     }
@@ -1082,7 +1081,10 @@ inline bool CDRMessage::readDataHolderSeq(
         return false;
     }
 
-    if (msg->pos + length > msg->length)
+    // Length should be at least 16 times the number of elements, since each DataHolder contains at least
+    // 1 empty string with 4 bytes for its length + at least 4 bytes of data (single NUL character + padding) and
+    // 2 empty property sequences, each with 4 bytes for its length
+    if (msg->pos + 16 * length > msg->length)
     {
         return false;
     }
@@ -1091,7 +1093,9 @@ inline bool CDRMessage::readDataHolderSeq(
     bool returnedValue = true;
     for (uint32_t i = 0; returnedValue && i < length; ++i)
     {
-        returnedValue = CDRMessage::readDataHolder(msg, data_holders.at(i), 0);
+        //! The parameter length should be the remaining length of the message
+        uint32_t remaining_length = msg->length - msg->pos;
+        returnedValue = CDRMessage::readDataHolder(msg, data_holders.at(i), remaining_length);
     }
 
     return returnedValue;
