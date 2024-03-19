@@ -1024,7 +1024,7 @@ inline bool CDRMessage::addDataHolder(
 inline bool CDRMessage::readDataHolder(
         CDRMessage_t* msg,
         DataHolder& data_holder,
-        const uint32_t& parameter_length)
+        const uint32_t parameter_length)
 {
     assert(msg);
 

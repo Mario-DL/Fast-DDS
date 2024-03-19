@@ -151,7 +151,7 @@ inline bool readBinaryPropertySeq(
 inline bool readDataHolder(
         CDRMessage_t* msg,
         DataHolder& data_holder,
-        const uint32_t& parameter_length);
+        const uint32_t parameter_length);
 
 inline bool readDataHolderSeq(
         CDRMessage_t* msg,
