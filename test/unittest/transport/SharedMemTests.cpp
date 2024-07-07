@@ -1447,7 +1447,7 @@ TEST_F(SHMTransportTests, buffer_recover)
                         {
                             auto buffer = listener1->pop();
 
-                            if (buffer)
+                            if (nullptr != buffer)
                             {
                                 listener1_recv_count.fetch_add(1);
                                 // This is a slow listener
@@ -1466,8 +1466,7 @@ TEST_F(SHMTransportTests, buffer_recover)
                         while (!exit_listeners)
                         {
                             auto buffer = listener2->pop();
-
-                            if (buffer)
+                            if (nullptr != buffer)
                             {
                                 listener2_recv_count.fetch_add(1);
                                 std::this_thread::sleep_for(std::chrono::milliseconds(listener2_sleep_ms));
@@ -1568,16 +1567,45 @@ TEST_F(SHMTransportTests, buffer_recover)
 
     exit_listeners = true;
 
+    // This third part of the test just tries to cleanly
+    // exit the threads.
+    
+    // At this point, listeners are blocked
+    // in the pop() method, and the ring buffers
+    // may (or not) be full.
+
+    //  In order to make the listeners to exit the pop()
+    //  we have to options:
+    //  - Waiting for the port_timeout_ms
+    //  - try pushing another buffer, so that cv could be 
+    //   notified.
+
+    // Sleeping the thread waiting for the port timeout 
+    // is more risky as the healthy timeout port watchdog 
+    // can be triggered, so we chosse the second option.
+
     {
         auto buf = segment->alloc_buffer(1u, std::chrono::steady_clock::time_point());
         {
             is_port_ok = false;
-            ASSERT_TRUE(pub_sub1_write->try_push(buf, is_port_ok));
+            while(!pushed)
+            {
+                pushed = pub_sub1_write->try_push(buf, is_port_ok);
+                is_port_ok &= is_port_ok;
+                std::this_thread::sleep_for(std::chrono::milliseconds(250));
+            }
+            //! In any case port should not be ok
             ASSERT_TRUE(is_port_ok);
         }
         {
             is_port_ok = false;
-            ASSERT_TRUE(pub_sub2_write->try_push(buf, is_port_ok));
+            while(!pushed)
+            {
+                pushed = pub_sub2_write->try_push(buf, is_port_ok);
+                is_port_ok &= is_port_ok;
+                std::this_thread::sleep_for(std::chrono::milliseconds(250));
+            }
+            //! In any case port should not be ok
             ASSERT_TRUE(is_port_ok);
         }
     }
